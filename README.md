@@ -1,11 +1,52 @@
-# NokeApp - Noke Smart Lock SDK Development
+# BleAppRN - Lock Smart Lock SDK Development
 
-Development project for creating a React Native SDK that enables third-party apps to integrate Noke Smart Lock functionality via Bluetooth Low Energy (BLE).
+Development project for creating a React Native SDK that enables third-party apps to integrate Lock Smart Lock functionality via Bluetooth Low Energy (BLE).
+
+---
+
+## 🔓 **NEW: Online Unlock Implementation**
+
+**Branch:** `feature/lock-unlock`
+
+✅ **Sistema completo de Unlock Online implementado para iOS y Android**
+
+Este branch incluye la implementación completa de unlock de candados Lock usando:
+- **Plataformas:** iOS (Swift) + Android (Kotlin) - Paridad completa
+- BLE (Bluetooth Low Energy) para comunicación directa con candados
+- Lock REST API para obtención de comandos encriptados
+- Auto-login al entrar al tab + Auto re-login cuando el token expira
+- Extracción de MAC address (desde nombre en iOS, desde advertising en Android)
+- UI completa con feedback visual en tiempo real
+- Auto-cierre del candado (función del firmware)
+- Manejo robusto de errores con recuperación automática
+
+📖 **Ver documentación completa:** [`NOKE_ONLINE_UNLOCK.md`](./NOKE_ONLINE_UNLOCK.md)
+
+**Quick Start:**
+
+iOS:
+1. Configurar credenciales en `src/config/nokeCredentials.ts`
+2. `npm install && cd ios && pod install && cd ..`
+3. `npm run ios` (requiere dispositivo iOS físico)
+
+Android:
+1. Configurar credenciales en `src/config/nokeCredentials.ts`
+2. `npm install`
+3. `npm run android` (dispositivo Android o emulador con BLE)
+
+4. Ir al tab "Native" → Escanear → Conectar → Unlock
+
+📋 **Documentación Técnica:**
+- [`NOKE_ONLINE_UNLOCK.md`](./NOKE_ONLINE_UNLOCK.md) - Guía completa de funcionalidad
+- [`IOS_VS_ANDROID_BLE.md`](./IOS_VS_ANDROID_BLE.md) - Análisis comparativo iOS vs Android
+- [`ANDROID_BLE_SOLUTION.md`](./ANDROID_BLE_SOLUTION.md) - Detalles técnicos de Android
+
+---
 
 ## 🎯 Project Goals
 
 This project serves as:
-1. **Development sandbox** for Noke BLE SDK
+1. **Development sandbox** for Lock BLE SDK
 2. **Demo application** showing SDK capabilities
 3. **Testing environment** for native module integration
 4. **Foundation** for two npm packages:
@@ -47,8 +88,8 @@ This project serves as:
 
 ```bash
 # Clone the repository
-git clone https://github.com/ricardopadilla-janus/NokeApp.git
-cd NokeApp
+git clone https://github.com/ricardopadilla-janus/LockApp.git
+cd LockApp
 
 # Install dependencies
 npm install
@@ -77,7 +118,7 @@ npm run android
 ## 🏗️ Project Structure
 
 ```
-NokeApp/
+LockApp/
 ├── src/
 │   ├── screens/
 │   │   ├── Home/              # BLE scanning (react-native-ble-manager)
@@ -96,7 +137,7 @@ NokeApp/
 ├── modules/
 │   ├── TestModule/            # Simple native validation module
 │   ├── NativeScanner/         # BLE scan-only native module
-│   └── NokeBleManager/        # Full BLE module (disabled)
+│   └── LockBleManager/        # Full BLE module (disabled)
 ├── ios/                       # iOS native code
 ├── android/                   # Android native code (future)
 └── docs/                      # Comprehensive documentation
@@ -156,11 +197,11 @@ Native BLE scanning using CoreBluetooth directly.
 
 **Location**: Native tab
 
-### NokeBleManager (Disabled - Future)
-Full BLE module with Noke protocol implementation.
+### LockBleManager (Disabled - Future)
+Full BLE module with Lock protocol implementation.
 
 **Status**: Structure created, awaiting existing native code import  
-**Location**: `modules/NokeBleManager/` (preserved but not compiled)
+**Location**: `modules/LockBleManager/` (preserved but not compiled)
 
 ---
 
@@ -200,7 +241,7 @@ npm run lint
 ```bash
 # iOS
 cd ios && rm -rf build Pods Podfile.lock && pod install && cd ..
-rm -rf ~/Library/Developer/Xcode/DerivedData/NokeApp-*
+rm -rf ~/Library/Developer/Xcode/DerivedData/LockApp-*
 
 # Clear Metro cache
 watchman watch-del-all
@@ -241,7 +282,7 @@ npm run ios
 This project will be extracted into two npm packages:
 
 ### @noke/ble-manager
-Native BLE module with Noke protocol implementation.
+Native BLE module with Lock protocol implementation.
 
 **Installation** (future):
 ```bash
@@ -251,13 +292,13 @@ cd ios && pod install
 
 **Usage**:
 ```typescript
-import NokeBLE from '@noke/ble-manager';
-await NokeBLE.startScan();
-await NokeBLE.unlock(deviceId);
+import LockBLE from '@noke/ble-manager';
+await LockBLE.startScan();
+await LockBLE.unlock(deviceId);
 ```
 
 ### @noke/ui-components
-Pre-built React Native UI components for Noke integration.
+Pre-built React Native UI components for Lock integration.
 
 **Installation** (future):
 ```bash
@@ -266,8 +307,8 @@ npm install @noke/ble-manager @noke/ui-components
 
 **Usage**:
 ```typescript
-import { NokeScanScreen } from '@noke/ui-components';
-<NokeScanScreen />
+import { LockScanScreen } from '@noke/ui-components';
+<LockScanScreen />
 ```
 
 ---
@@ -294,10 +335,10 @@ import { NokeScanScreen } from '@noke/ui-components';
 - [x] Comprehensive documentation
 
 ### Phase 2: Native Code Import (In Progress)
-- [ ] Import existing Noke native BLE code
+- [ ] Import existing Lock native BLE code
 - [ ] Replace basic scanning with production code
 - [ ] Add connection management
-- [ ] Implement Noke protocols
+- [ ] Implement Lock protocols
 
 ### Phase 3: SDK Extraction
 - [ ] Extract to @noke/ble-manager package
