@@ -1,7 +1,7 @@
 import Foundation
 
-@objc(NokeAPIClient)
-class NokeAPIClient: NSObject {
+@objc(LockAPIClient)
+class LockAPIClient: NSObject {
     
     // MARK: - Properties
     
@@ -25,7 +25,7 @@ class NokeAPIClient: NSObject {
             baseURL = environment // URL personalizada
         }
         
-        NSLog("[NokeAPIClient] Environment set to: %@", baseURL)
+        NSLog("[LockAPIClient] Environment set to: %@", baseURL)
         resolve(baseURL)
     }
     
@@ -40,7 +40,7 @@ class NokeAPIClient: NSObject {
               resolve: @escaping RCTPromiseResolveBlock,
               reject: @escaping RCTPromiseRejectBlock) {
         
-        NSLog("[NokeAPIClient] Login attempt for: %@", email)
+        NSLog("[LockAPIClient] Login attempt for: %@", email)
         
         guard let url = URL(string: "\(baseURL)login/") else {
             reject("INVALID_URL", "Invalid base URL", nil)
@@ -64,7 +64,7 @@ class NokeAPIClient: NSObject {
                         // Log complete login response
                         if let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted),
                            let jsonString = String(data: jsonData, encoding: .utf8) {
-                            print("[NokeAPIClient] 📋 LOGIN RESPONSE:")
+                            print("[LockAPIClient] 📋 LOGIN RESPONSE:")
                             print(jsonString)
                         }
                         
@@ -84,9 +84,9 @@ class NokeAPIClient: NSObject {
                         }
                         self?.userUUID = extractedUserUUID
                         
-                        print("[NokeAPIClient] ✅ Login successful")
-                        print("[NokeAPIClient]    Auth Token: \(String((self?.authToken ?? "").prefix(30)))")
-                        print("[NokeAPIClient]    User UUID: \(self?.userUUID ?? "N/A")")
+                        print("[LockAPIClient] ✅ Login successful")
+                        print("[LockAPIClient]    Auth Token: \(String((self?.authToken ?? "").prefix(30)))")
+                        print("[LockAPIClient]    User UUID: \(self?.userUUID ?? "N/A")")
                         
                         // Extraer defaultSiteUUID del objeto data también
                         var defaultSite = siteUUID
@@ -113,7 +113,7 @@ class NokeAPIClient: NSObject {
                 }
                 
             case .failure(let error):
-                NSLog("[NokeAPIClient] ❌ Login failed: %@", error.localizedDescription)
+                NSLog("[LockAPIClient] ❌ Login failed: %@", error.localizedDescription)
                 reject("LOGIN_FAILED", error.localizedDescription, error)
             }
         }
@@ -128,7 +128,7 @@ class NokeAPIClient: NSObject {
                           resolve: @escaping RCTPromiseResolveBlock,
                           reject: @escaping RCTPromiseRejectBlock) {
         
-        print("[NokeAPIClient] 📤 Getting locks from user/locks/...")
+        print("[LockAPIClient] 📤 Getting locks from user/locks/...")
         
         guard let url = URL(string: "\(baseURL)user/locks/") else {
             reject("INVALID_URL", "Invalid base URL", nil)
@@ -138,7 +138,7 @@ class NokeAPIClient: NSObject {
         // Este endpoint usa body vacío
         let body: [String: Any] = [:]
         
-        print("[NokeAPIClient] 📤 Using endpoint: user/locks/ (empty body)")
+        print("[LockAPIClient] 📤 Using endpoint: user/locks/ (empty body)")
         
         performRequest(url: url, method: "POST", body: body, authorized: true) { result in
             switch result {
@@ -147,7 +147,7 @@ class NokeAPIClient: NSObject {
                     if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                         
                         // ALWAYS log the complete response for debugging
-                        print("[NokeAPIClient] 📥 GETLOCKSBYUSER RESPONSE:")
+                        print("[LockAPIClient] 📥 GETLOCKSBYUSER RESPONSE:")
                         if let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted),
                            let jsonString = String(data: jsonData, encoding: .utf8) {
                             print(jsonString)
@@ -224,38 +224,38 @@ class NokeAPIClient: NSObject {
                             }
                         }
                         
-                        NSLog("[NokeAPIClient] ✅ Offline keys obtained")
-                        NSLog("[NokeAPIClient]    Total devices: %d", totalDevices)
-                        NSLog("[NokeAPIClient]    Devices with keys: %d", devicesWithKeys)
+                        NSLog("[LockAPIClient] ✅ Offline keys obtained")
+                        NSLog("[LockAPIClient]    Total devices: %d", totalDevices)
+                        NSLog("[LockAPIClient]    Devices with keys: %d", devicesWithKeys)
                         
                         // Debug: Log details when no devices found
                         if totalDevices == 0 {
-                            print("[NokeAPIClient] ⚠️  No locks found in response")
+                            print("[LockAPIClient] ⚠️  No locks found in response")
                             
                             if let dataObj = json["data"] as? [String: Any],
                                let units = dataObj["units"] as? [[String: Any]] {
-                                print("[NokeAPIClient]    Total units in response: \(units.count)")
+                                print("[LockAPIClient]    Total units in response: \(units.count)")
                                 for (index, unit) in units.enumerated() {
                                     let unitName = unit["name"] as? String ?? "N/A"
-                                    print("[NokeAPIClient]    Unit \(index): \(unitName)")
+                                    print("[LockAPIClient]    Unit \(index): \(unitName)")
                                     if let locks = unit["locks"] as? [[String: Any]] {
-                                        print("[NokeAPIClient]       Locks in unit: \(locks.count)")
+                                        print("[LockAPIClient]       Locks in unit: \(locks.count)")
                                         for lock in locks {
                                             let mac = lock["mac"] as? String ?? "N/A"
                                             let name = lock["name"] as? String ?? "N/A"
-                                            print("[NokeAPIClient]       - MAC: \(mac), Name: \(name)")
+                                            print("[LockAPIClient]       - MAC: \(mac), Name: \(name)")
                                             
                                             let offlineKey = lock["offlineKey"] as? String ?? ""
                                             let unlockCmd = lock["unlockCmd"] as? String ?? ""
-                                            print("[NokeAPIClient]         offlineKey: '\(offlineKey.isEmpty ? "EMPTY" : "HAS_VALUE")'")
-                                            print("[NokeAPIClient]         unlockCmd: '\(unlockCmd.isEmpty ? "EMPTY" : "HAS_VALUE")'")
+                                            print("[LockAPIClient]         offlineKey: '\(offlineKey.isEmpty ? "EMPTY" : "HAS_VALUE")'")
+                                            print("[LockAPIClient]         unlockCmd: '\(unlockCmd.isEmpty ? "EMPTY" : "HAS_VALUE")'")
                                         }
                                     } else {
-                                        print("[NokeAPIClient]       No 'locks' array in this unit")
+                                        print("[LockAPIClient]       No 'locks' array in this unit")
                                     }
                                 }
                             } else {
-                                print("[NokeAPIClient]    No 'data.units' array in response")
+                                print("[LockAPIClient]    No 'data.units' array in response")
                             }
                         }
                         
@@ -268,7 +268,7 @@ class NokeAPIClient: NSObject {
                 }
                 
             case .failure(let error):
-                NSLog("[NokeAPIClient] ❌ Failed to get offline keys: %@", error.localizedDescription)
+                NSLog("[LockAPIClient] ❌ Failed to get offline keys: %@", error.localizedDescription)
                 reject("API_ERROR", error.localizedDescription, error)
             }
         }
@@ -282,7 +282,7 @@ class NokeAPIClient: NSObject {
                           resolve: @escaping RCTPromiseResolveBlock,
                           reject: @escaping RCTPromiseRejectBlock) {
         
-        NSLog("[NokeAPIClient] Getting unlock commands for: %@", mac)
+        NSLog("[LockAPIClient] Getting unlock commands for: %@", mac)
         
         guard let url = URL(string: "\(baseURL)lock/unlock/") else {
             reject("INVALID_URL", "Invalid base URL", nil)
@@ -301,7 +301,7 @@ class NokeAPIClient: NSObject {
                     if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                         
                         // Log complete response for debugging
-                        print("[NokeAPIClient] 📥 UNLOCK RESPONSE:")
+                        print("[LockAPIClient] 📥 UNLOCK RESPONSE:")
                         if let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted),
                            let jsonString = String(data: jsonData, encoding: .utf8) {
                             print(jsonString)
@@ -311,7 +311,7 @@ class NokeAPIClient: NSObject {
                         if let result = json["result"] as? String, result == "failure" {
                             let errorMessage = json["message"] as? String ?? "Unknown error"
                             let errorCode = json["errorCode"] as? Int ?? -1
-                            print("[NokeAPIClient] ❌ API returned error: \(errorMessage) (code: \(errorCode))")
+                            print("[LockAPIClient] ❌ API returned error: \(errorMessage) (code: \(errorCode))")
                             reject("API_ERROR", errorMessage, nil)
                             return
                         }
@@ -332,15 +332,15 @@ class NokeAPIClient: NSObject {
                         if let commands = commandsArray, !commands.isEmpty {
                             let commandString = commands.joined(separator: "+")
                             
-                            print("[NokeAPIClient] ✅ Unlock commands received: \(commands.count) commands")
+                            print("[LockAPIClient] ✅ Unlock commands received: \(commands.count) commands")
                             
                             resolve([
                                 "commandString": commandString,
                                 "commands": commands
                             ])
                         } else {
-                            print("[NokeAPIClient] ❌ No 'commands' array found in response")
-                            print("[NokeAPIClient] Response keys: \(Array(json.keys).joined(separator: ", "))")
+                            print("[LockAPIClient] ❌ No 'commands' array found in response")
+                            print("[LockAPIClient] Response keys: \(Array(json.keys).joined(separator: ", "))")
                             
                             // Return the full JSON for debugging
                             reject("PARSE_ERROR", "No commands found in response. See logs for details.", nil)
@@ -353,7 +353,7 @@ class NokeAPIClient: NSObject {
                 }
                 
             case .failure(let error):
-                NSLog("[NokeAPIClient] ❌ Failed to get unlock commands: %@", error.localizedDescription)
+                NSLog("[LockAPIClient] ❌ Failed to get unlock commands: %@", error.localizedDescription)
                 reject("API_ERROR", error.localizedDescription, error)
             }
         }
@@ -365,7 +365,7 @@ class NokeAPIClient: NSObject {
     func getSupportCommands(_ resolve: @escaping RCTPromiseResolveBlock,
                            reject: @escaping RCTPromiseRejectBlock) {
         
-        NSLog("[NokeAPIClient] Getting support commands...")
+        NSLog("[LockAPIClient] Getting support commands...")
         
         guard let url = URL(string: "\(baseURL)support/lockcmds/") else {
             reject("INVALID_URL", "Invalid base URL", nil)
@@ -379,8 +379,8 @@ class NokeAPIClient: NSObject {
                     if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
                        let locks = json["locks"] as? [[String: Any]] {
                         
-                        NSLog("[NokeAPIClient] ✅ Support commands received")
-                        NSLog("[NokeAPIClient]    Total locks: %d", locks.count)
+                        NSLog("[LockAPIClient] ✅ Support commands received")
+                        NSLog("[LockAPIClient]    Total locks: %d", locks.count)
                         
                         resolve(locks)
                     } else {
@@ -391,7 +391,7 @@ class NokeAPIClient: NSObject {
                 }
                 
             case .failure(let error):
-                NSLog("[NokeAPIClient] ❌ Failed to get support commands: %@", error.localizedDescription)
+                NSLog("[LockAPIClient] ❌ Failed to get support commands: %@", error.localizedDescription)
                 reject("API_ERROR", error.localizedDescription, error)
             }
         }
@@ -404,7 +404,7 @@ class NokeAPIClient: NSObject {
                    resolve: @escaping RCTPromiseResolveBlock,
                    reject: @escaping RCTPromiseRejectBlock) {
         
-        NSLog("[NokeAPIClient] Locate lock: %@", lockUUID)
+        NSLog("[LockAPIClient] Locate lock: %@", lockUUID)
         
         guard let url = URL(string: "\(baseURL)lock/locate/") else {
             reject("INVALID_URL", "Invalid base URL", nil)
@@ -418,11 +418,11 @@ class NokeAPIClient: NSObject {
         performRequest(url: url, method: "POST", body: body, authorized: true) { result in
             switch result {
             case .success(_):
-                NSLog("[NokeAPIClient] ✅ Locate command sent")
+                NSLog("[LockAPIClient] ✅ Locate command sent")
                 resolve(true)
                 
             case .failure(let error):
-                NSLog("[NokeAPIClient] ❌ Failed to locate lock: %@", error.localizedDescription)
+                NSLog("[LockAPIClient] ❌ Failed to locate lock: %@", error.localizedDescription)
                 reject("API_ERROR", error.localizedDescription, error)
             }
         }
@@ -441,7 +441,7 @@ class NokeAPIClient: NSObject {
                      resolve: @escaping RCTPromiseResolveBlock,
                      reject: @escaping RCTPromiseRejectBlock) {
         authToken = token
-        NSLog("[NokeAPIClient] Auth token set")
+        NSLog("[LockAPIClient] Auth token set")
         resolve(true)
     }
     
@@ -450,7 +450,7 @@ class NokeAPIClient: NSObject {
                        reject: @escaping RCTPromiseRejectBlock) {
         authToken = nil
         userUUID = nil
-        NSLog("[NokeAPIClient] Auth token cleared")
+        NSLog("[LockAPIClient] Auth token cleared")
         resolve(true)
     }
     
@@ -497,7 +497,7 @@ class NokeAPIClient: NSObject {
                 return
             }
             
-            NSLog("[NokeAPIClient] 📥 Response: %d", httpResponse.statusCode)
+            NSLog("[LockAPIClient] 📥 Response: %d", httpResponse.statusCode)
             
             guard let data = data else {
                 completion(.failure(NSError(domain: "NokeAPIClient", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
@@ -506,7 +506,7 @@ class NokeAPIClient: NSObject {
             
             // Log response for debugging
             if let jsonString = String(data: data, encoding: .utf8) {
-                NSLog("[NokeAPIClient]    Response data: %@", jsonString)
+                NSLog("[LockAPIClient]    Response data: %@", jsonString)
             }
             
             // Check status code
@@ -551,7 +551,7 @@ class NokeAPIClient: NSObject {
             curlCommand += " \\\n  -d '\(escapedBody)'"
         }
         
-        print("\n[NokeAPIClient] 🔧 CURL COMMAND:")
+        print("\n[LockAPIClient] 🔧 CURL COMMAND:")
         print("─────────────────────────────────────────────────────────")
         print(curlCommand)
         print("─────────────────────────────────────────────────────────\n")

@@ -1,6 +1,6 @@
 #import <React/RCTBridgeModule.h>
 
-@interface RCT_EXTERN_MODULE(NokeAPIClient, NSObject)
+@interface RCT_EXTERN_MODULE(LockAPIClient, NSObject)
 
 // Configuration
 RCT_EXTERN_METHOD(setEnvironment:(NSString *)environment

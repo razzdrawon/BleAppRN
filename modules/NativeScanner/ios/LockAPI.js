@@ -1,7 +1,7 @@
 /**
- * NokeAPI - Wrapper para el módulo nativo NokeAPIClient
+ * LockAPI - Wrapper para el módulo nativo LockAPIClient
  * 
- * Este módulo maneja toda la comunicación con la API de Noke:
+ * Este módulo maneja toda la comunicación con la API de Lock:
  * - Login y autenticación
  * - Obtención de offline keys
  * - Comandos de unlock online
@@ -12,17 +12,17 @@
 import { NativeModules } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const { NokeAPIClient } = NativeModules;
+const { LockAPIClient } = NativeModules;
 
 // Keys para AsyncStorage
 const STORAGE_KEYS = {
-  AUTH_TOKEN: '@noke_auth_token',
-  USER_DATA: '@noke_user_data',
-  OFFLINE_KEYS: '@noke_offline_keys',
-  OFFLINE_KEYS_TIMESTAMP: '@noke_offline_keys_timestamp',
+  AUTH_TOKEN: '@lock_auth_token',
+  USER_DATA: '@lock_user_data',
+  OFFLINE_KEYS: '@lock_offline_keys',
+  OFFLINE_KEYS_TIMESTAMP: '@lock_offline_keys_timestamp',
 };
 
-class NokeAPI {
+class LockAPI {
   constructor() {
     this.userData = null;
     this.offlineKeys = null;
@@ -38,11 +38,11 @@ class NokeAPI {
    */
   async setEnvironment(environment) {
     try {
-      const url = await NokeAPIClient.setEnvironment(environment);
-      console.log(`[NokeAPI] Environment set to: ${url}`);
+      const url = await LockAPIClient.setEnvironment(environment);
+      console.log(`[LockAPI] Environment set to: ${url}`);
       return url;
     } catch (error) {
-      console.error('[NokeAPI] Error setting environment:', error);
+      console.error('[LockAPI] Error setting environment:', error);
       throw error;
     }
   }
@@ -62,13 +62,13 @@ class NokeAPI {
    */
   async login({ email, password, companyUUID, siteUUID, deviceId }) {
     try {
-      console.log('[NokeAPI] Logging in...');
+      console.log('[LockAPI] Logging in...');
 
       // Generar deviceUUID si no se provee
       const finalDeviceUUID = deviceId || await this._getOrCreateDeviceId();
 
       // Hacer login
-      const result = await NokeAPIClient.login(
+      const result = await LockAPIClient.login(
         email,
         password,
         companyUUID,
@@ -82,15 +82,15 @@ class NokeAPI {
       await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(result));
 
       // Configurar token en el módulo
-      await NokeAPIClient.setAuthToken(result.authToken);
+      await LockAPIClient.setAuthToken(result.authToken);
 
-      console.log('[NokeAPI] ✅ Login successful');
-      console.log(`[NokeAPI]    User UUID: ${result.userUUID}`);
-      console.log(`[NokeAPI]    Site UUID: ${result.siteUUID}`);
+      console.log('[LockAPI] ✅ Login successful');
+      console.log(`[LockAPI]    User UUID: ${result.userUUID}`);
+      console.log(`[LockAPI]    Site UUID: ${result.siteUUID}`);
 
       return result;
     } catch (error) {
-      console.error('[NokeAPI] ❌ Login failed:', error);
+      console.error('[LockAPI] ❌ Login failed:', error);
       throw error;
     }
   }
@@ -105,16 +105,16 @@ class NokeAPI {
 
       if (authToken && userDataString) {
         this.userData = JSON.parse(userDataString);
-        await NokeAPIClient.setAuthToken(authToken);
+        await LockAPIClient.setAuthToken(authToken);
         
-        console.log('[NokeAPI] ✅ Session restored');
+        console.log('[LockAPI] ✅ Session restored');
         return this.userData;
       }
 
-      console.log('[NokeAPI] No session to restore');
+      console.log('[LockAPI] No session to restore');
       return null;
     } catch (error) {
-      console.error('[NokeAPI] Error restoring session:', error);
+      console.error('[LockAPI] Error restoring session:', error);
       return null;
     }
   }
@@ -124,15 +124,15 @@ class NokeAPI {
    */
   async logout() {
     try {
-      await NokeAPIClient.clearAuthToken();
+      await LockAPIClient.clearAuthToken();
       await AsyncStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
       await AsyncStorage.removeItem(STORAGE_KEYS.USER_DATA);
       
       this.userData = null;
       
-      console.log('[NokeAPI] ✅ Logged out');
+      console.log('[LockAPI] ✅ Logged out');
     } catch (error) {
-      console.error('[NokeAPI] Error logging out:', error);
+      console.error('[LockAPI] Error logging out:', error);
       throw error;
     }
   }
@@ -166,20 +166,20 @@ class NokeAPI {
       if (!forceRefresh) {
         const cached = await this._getCachedOfflineKeys();
         if (cached) {
-          console.log('[NokeAPI] ✅ Using cached offline keys');
+          console.log('[LockAPI] ✅ Using cached offline keys');
           this.offlineKeys = cached;
           return cached;
         }
       }
 
-      console.log('[NokeAPI] Fetching offline keys from API...');
-      console.log('[NokeAPI] 📤 Calling getAllOfflineKeys with:');
-      console.log('[NokeAPI]    userUUID:', this.userData.userUUID);
-      console.log('[NokeAPI]    companyUUID:', this.userData.companyUUID);
-      console.log('[NokeAPI]    siteUUID:', this.userData.siteUUID);
+      console.log('[LockAPI] Fetching offline keys from API...');
+      console.log('[LockAPI] 📤 Calling getAllOfflineKeys with:');
+      console.log('[LockAPI]    userUUID:', this.userData.userUUID);
+      console.log('[LockAPI]    companyUUID:', this.userData.companyUUID);
+      console.log('[LockAPI]    siteUUID:', this.userData.siteUUID);
 
       // Obtener del servidor
-      const keys = await NokeAPIClient.getAllOfflineKeys(
+      const keys = await LockAPIClient.getAllOfflineKeys(
         this.userData.userUUID,
         this.userData.companyUUID,
         this.userData.siteUUID
@@ -192,11 +192,11 @@ class NokeAPI {
       this.offlineKeys = keys;
 
       const count = Object.keys(keys).length;
-      console.log(`[NokeAPI] ✅ Offline keys obtained and cached (${count} devices)`);
+      console.log(`[LockAPI] ✅ Offline keys obtained and cached (${count} devices)`);
 
       return keys;
     } catch (error) {
-      console.error('[NokeAPI] ❌ Error getting offline keys:', error);
+      console.error('[LockAPI] ❌ Error getting offline keys:', error);
       throw error;
     }
   }
@@ -215,15 +215,15 @@ class NokeAPI {
       const device = this.offlineKeys[mac];
 
       if (!device) {
-        console.log(`[NokeAPI] ⚠️  Device ${mac} not found`);
-        console.log('[NokeAPI] Available MACs:', Object.keys(this.offlineKeys));
+        console.log(`[LockAPI] ⚠️  Device ${mac} not found`);
+        console.log('[LockAPI] Available MACs:', Object.keys(this.offlineKeys));
         return null;
       }
 
-      console.log(`[NokeAPI] ✅ Offline key found for ${device.name} (${mac})`);
+      console.log(`[LockAPI] ✅ Offline key found for ${device.name} (${mac})`);
       return device;
     } catch (error) {
-      console.error('[NokeAPI] Error getting device key:', error);
+      console.error('[LockAPI] Error getting device key:', error);
       throw error;
     }
   }
@@ -252,7 +252,7 @@ class NokeAPI {
 
       return devices;
     } catch (error) {
-      console.error('[NokeAPI] Error listing devices:', error);
+      console.error('[LockAPI] Error listing devices:', error);
       throw error;
     }
   }
@@ -270,34 +270,34 @@ class NokeAPI {
     try {
       // Verificar sesión o restaurar
       if (!this.userData) {
-        console.log('[NokeAPI] No userData, attempting to restore session...');
+        console.log('[LockAPI] No userData, attempting to restore session...');
         await this.restoreSession();
         if (!this.userData) {
           throw new Error('Not logged in. Session expired, please restart the app.');
         }
       }
 
-      console.log(`[NokeAPI] Getting unlock commands for ${mac}...`);
-      console.log(`[NokeAPI] Session: ${session}`);
+      console.log(`[LockAPI] Getting unlock commands for ${mac}...`);
+      console.log(`[LockAPI] Session: ${session}`);
 
-      const result = await NokeAPIClient.getUnlockCommands(mac, session);
+      const result = await LockAPIClient.getUnlockCommands(mac, session);
       
-      console.log('[NokeAPI] 📥 Raw result from native:', JSON.stringify(result, null, 2));
+      console.log('[LockAPI] 📥 Raw result from native:', JSON.stringify(result, null, 2));
 
-      console.log(`[NokeAPI] ✅ Unlock commands received (${result.commands?.length || 0} commands)`);
+      console.log(`[LockAPI] ✅ Unlock commands received (${result.commands?.length || 0} commands)`);
 
       return {
         commandString: result.commandString, // Para usar con NativeScanner.sendCommands()
         commands: result.commands,
       };
     } catch (error) {
-      console.error('[NokeAPI] Error getting unlock commands:', error);
+      console.error('[LockAPI] Error getting unlock commands:', error);
       
       // Si es un error de token, limpiar la sesión guardada
       if (error.message?.includes('Token error') || error.message?.includes('token_error')) {
-        console.log('[NokeAPI] Token expired, clearing session...');
+        console.log('[LockAPI] Token expired, clearing session...');
         this.userData = null;
-        await NokeAPIClient.clearAuthToken();
+        await LockAPIClient.clearAuthToken();
         throw new Error('Session expired. Please restart the app to login again.');
       }
       
@@ -314,15 +314,15 @@ class NokeAPI {
    */
   async getSupportCommands() {
     try {
-      console.log('[NokeAPI] Getting support commands...');
+      console.log('[LockAPI] Getting support commands...');
 
-      const locks = await NokeAPIClient.getSupportCommands();
+      const locks = await LockAPIClient.getSupportCommands();
 
-      console.log(`[NokeAPI] ✅ Support commands received (${locks.length} locks)`);
+      console.log(`[LockAPI] ✅ Support commands received (${locks.length} locks)`);
 
       return locks;
     } catch (error) {
-      console.error('[NokeAPI] Error getting support commands:', error);
+      console.error('[LockAPI] Error getting support commands:', error);
       throw error;
     }
   }
@@ -337,14 +337,14 @@ class NokeAPI {
    */
   async locateLock(lockUUID) {
     try {
-      console.log(`[NokeAPI] Locating lock ${lockUUID}...`);
+      console.log(`[LockAPI] Locating lock ${lockUUID}...`);
 
-      await NokeAPIClient.locateLock(lockUUID);
+      await LockAPIClient.locateLock(lockUUID);
 
-      console.log('[NokeAPI] ✅ Locate command sent');
+      console.log('[LockAPI] ✅ Locate command sent');
       return true;
     } catch (error) {
-      console.error('[NokeAPI] Error locating lock:', error);
+      console.error('[LockAPI] Error locating lock:', error);
       throw error;
     }
   }
@@ -390,7 +390,7 @@ class NokeAPI {
       const maxAge = 24 * 60 * 60 * 1000; // 24 horas
 
       if (cacheAge > maxAge) {
-        console.log('[NokeAPI] Cache expired, will fetch fresh data');
+        console.log('[LockAPI] Cache expired, will fetch fresh data');
         return null;
       }
 
@@ -407,10 +407,10 @@ class NokeAPI {
     await AsyncStorage.removeItem(STORAGE_KEYS.OFFLINE_KEYS);
     await AsyncStorage.removeItem(STORAGE_KEYS.OFFLINE_KEYS_TIMESTAMP);
     this.offlineKeys = null;
-    console.log('[NokeAPI] Offline keys cache cleared');
+    console.log('[LockAPI] Offline keys cache cleared');
   }
 }
 
 // Exportar instancia singleton
-export default new NokeAPI();
+export default new LockAPI();
 

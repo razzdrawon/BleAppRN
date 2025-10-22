@@ -5,10 +5,10 @@ import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.uimanager.ViewManager
 
-class NokeAPIClientPackage : ReactPackage {
+class LockAPIClientPackage : ReactPackage {
     
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
-        return listOf(NokeAPIClient(reactContext))
+        return listOf(LockAPIClient(reactContext))
     }
 
     override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {

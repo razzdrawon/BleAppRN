@@ -12,15 +12,15 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * NokeAPIClient - Cliente HTTP nativo para Noke API
- * Equivalente al NokeAPIClient.swift de iOS
+ * LockAPIClient - Cliente HTTP nativo para Lock API
+ * Equivalente al LockAPIClient.swift de iOS
  */
-class NokeAPIClient(private val reactContext: ReactApplicationContext) :
+class LockAPIClient(private val reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
 
     companion object {
-        private const val TAG = "NokeAPIClient"
-        private const val MODULE_NAME = "NokeAPIClient"
+        private const val TAG = "LockAPIClient"
+        private const val MODULE_NAME = "LockAPIClient"
         private const val BASE_URL_PRODUCTION = "https://router.smartentry.noke.dev/"
         private const val BASE_URL_SANDBOX = "https://router-sandbox.smartentry.noke.dev/"
     }

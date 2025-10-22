@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import { styles, getSignalStrength } from './styles';
 import NativeScanner, { BleDevice, FilterSettings } from '../../../modules/NativeScanner/js/index';
-import NokeAPI from '../../../modules/NativeScanner/ios/NokeAPI';
-import { NOKE_CREDENTIALS } from '../../config/nokeCredentials';
+import LockAPI from '../../../modules/NativeScanner/ios/LockAPI';
+import { LOCK_CREDENTIALS } from '../../config/lockCredentials';
 
 export const NativeScanScreen: React.FC = () => {
   const [isScanning, setIsScanning] = useState(false);
@@ -311,7 +311,7 @@ export const NativeScanScreen: React.FC = () => {
       console.log('[NativeScan] Using session:', session.substring(0, 16) + '...');
       
       setUnlockStatus((prev) => ({ ...prev, [deviceId]: '📡 Getting unlock commands...' }));
-      const unlockData = await NokeAPI.getUnlockCommands(macAddress, session);
+      const unlockData = await LockAPI.getUnlockCommands(macAddress, session);
       
       console.log('[NativeScan] Got unlock commands:', unlockData.commands?.length || 0);
       setUnlockStatus((prev) => ({ ...prev, [deviceId]: '🔐 Sending unlock...' }));
@@ -400,7 +400,7 @@ export const NativeScanScreen: React.FC = () => {
       // If force login, skip restore and do fresh login
       if (!forceLogin) {
         // Try to restore existing session
-        const session = await NokeAPI.restoreSession();
+        const session = await LockAPI.restoreSession();
         if (session) {
           console.log('[NativeScan] ✅ Session restored:', session.email);
           setIsLoggedIn(true);
@@ -412,15 +412,15 @@ export const NativeScanScreen: React.FC = () => {
       console.log('[NativeScan] Performing fresh login...');
       
       // Set environment
-      await NokeAPI.setEnvironment(NOKE_CREDENTIALS.environment);
+      await LockAPI.setEnvironment(LOCK_CREDENTIALS.environment);
       
       // Login
-      const loginResult = await NokeAPI.login({
-        email: NOKE_CREDENTIALS.email,
-        password: NOKE_CREDENTIALS.password,
-        companyUUID: NOKE_CREDENTIALS.companyUUID,
-        siteUUID: NOKE_CREDENTIALS.siteUUID,
-        deviceId: NOKE_CREDENTIALS.deviceId || undefined,
+      const loginResult = await LockAPI.login({
+        email: LOCK_CREDENTIALS.email,
+        password: LOCK_CREDENTIALS.password,
+        companyUUID: LOCK_CREDENTIALS.companyUUID,
+        siteUUID: LOCK_CREDENTIALS.siteUUID,
+        deviceId: LOCK_CREDENTIALS.deviceId || undefined,
       });
       
       console.log('[NativeScan] ✅ Logged in:', loginResult.userUUID);
